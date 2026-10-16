@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+
+    rule_files:
+      - /etc/prometheus/alert.rules.yml
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      - job_name: 'order-service'
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['order-service.orders.svc.cluster.local:80']
+
+  alert.rules.yml: |
+    groups:
+      - name: order_service_alerts
+        rules:
+          - alert: OrderServiceDown
+            expr: up{job="order-service"} == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: "Order Service instance is DOWN"
+              description: "Order Service in orders namespace has stopped responding for > 30 seconds."
+
+          - alert: HighOrderErrorRate
+            expr: rate(http_server_requests_seconds_count{status=~"5.."}[1m]) > 0.05
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High HTTP 5xx error rate on Order Service"
+              description: "More than 5% of order service requests are failing with 5xx server errors."
