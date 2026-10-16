@@ -1,0 +1,17 @@
+# Debug Drill 1: CrashLoopBackOff
+# Root Cause: The application process starts, throws an unhandled error or fatal exit, and terminates immediately.
+# Kubelet restarts it with exponential backoff delay (10s, 20s, 40s... up to 5m).
+# Diagnostic Command:
+#   kubectl describe pod drill-crashloop -n orders  (Look at State: Terminated, Exit Code, Restart Count)
+#   kubectl logs drill-crashloop -n orders --previous (Read the crash log before restart)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: drill-crashloop
+  namespace: orders
+spec:
+  containers:
+    - name: crashing-container
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      args: ["echo 'Starting critical service...'; sleep 2; echo 'FATAL: database connection timeout!'; exit 1"]

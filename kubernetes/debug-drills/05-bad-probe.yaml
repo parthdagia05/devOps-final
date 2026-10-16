@@ -1,0 +1,27 @@
+# Debug Drill 5: Wrong Probe Path (Pod Running 0/1, Traffic Not Routed)
+# Root Cause: The readiness probe checks a non-existent HTTP endpoint or port.
+# The container is running, but kubelet never marks the Pod as Ready.
+# Consequently, Endpoints controller never adds this Pod IP to the Service, so users get 503 or timeout.
+# Diagnostic Command:
+#   kubectl describe pod drill-bad-probe -n orders (Look at Events: Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 404)
+#   kubectl get endpoints -n orders
+apiVersion: v1
+kind: Pod
+metadata:
+  name: drill-bad-probe
+  namespace: orders
+  labels:
+    app: order-service
+spec:
+  containers:
+    - name: order-service
+      image: order-service:1.0
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        httpGet:
+          path: /non-existent-probe-path
+          port: 8080
+        initialDelaySeconds: 2
+        periodSeconds: 2

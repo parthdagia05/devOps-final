@@ -1,0 +1,21 @@
+# Debug Drill 4: OOMKilled (Exit Code 137)
+# Root Cause: The container memory consumption exceeds `resources.limits.memory`.
+# The Linux kernel Out-Of-Memory (OOM) killer sends SIGKILL (kill -9, 128 + 9 = exit 137) to the process.
+# Diagnostic Command:
+#   kubectl describe pod drill-oomkilled -n orders (Look at Last State: Terminated, Reason: OOMKilled, Exit Code: 137)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: drill-oomkilled
+  namespace: orders
+spec:
+  restartPolicy: Never
+  containers:
+    - name: memory-eater
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      # Attempts to allocate 100MB using tail /dev/zero, but limit is 10Mi
+      args: ["tail -n 10000000 /dev/zero"]
+      resources:
+        limits:
+          memory: "10Mi"

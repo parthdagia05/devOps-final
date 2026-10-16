@@ -1,0 +1,14 @@
+# Debug Drill 2: ImagePullBackOff / ErrImagePull
+# Root Cause: The image name, tag, or registry typo prevents kubelet/containerd from pulling the image.
+# Diagnostic Command:
+#   kubectl describe pod drill-imagepull -n orders (Look at Events: Failed to pull image, manifest unknown)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: drill-imagepull
+  namespace: orders
+spec:
+  containers:
+    - name: app
+      image: order-service:99.9.9-nonexistent
+      imagePullPolicy: Always

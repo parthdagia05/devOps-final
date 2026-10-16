@@ -1,0 +1,18 @@
+# Debug Drill 3: Pod Stuck in "Pending"
+# Root Cause: The kube-scheduler cannot find any worker node that satisfies the Pod's resource requests or constraints.
+# Diagnostic Command:
+#   kubectl describe pod drill-pending -n orders (Look at Events: FailedScheduling: 0/2 nodes are available: 2 Insufficient cpu/memory)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: drill-pending
+  namespace: orders
+spec:
+  containers:
+    - name: hungry-app
+      image: alpine:latest
+      command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: "128"             # Cluster worker only has 1-2 CPUs, so it can never be scheduled
+          memory: "256Gi"
