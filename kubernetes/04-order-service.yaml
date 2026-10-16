@@ -4,7 +4,8 @@ metadata:
   name: order-service
   namespace: orders
 spec:
-  replicas: 2                      # 2 copies; ids still unique because Postgres generates them
+  # replicas is owned by the HPA (05-hpa.yaml, min 2). Setting it here would make
+  # Argo CD selfHeal reset every scale event back to the Git value.
   selector:
     matchLabels:
       app: order-service           # Deployment manages pods with this label...
