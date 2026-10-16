@@ -1,0 +1,29 @@
+services:
+  orders-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: orderuser
+      POSTGRES_PASSWORD: orderpassword
+      POSTGRES_DB: orderdb
+    volumes:
+      - orders-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orderuser -d orderdb"]
+      interval: 5s
+      retries: 10
+
+  order-service:
+    build: ../application/order-service
+    image: order-service:1.0
+    ports: 
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://orders-db:5432/orderdb
+      SPRING_DATASOURCE_USERNAME: orderuser
+      SPRING_DATASOURCE_PASSWORD: orderpassword
+    depends_on:
+      orders-db:  
+        condition: service_healthy
+
+volumes:
+  orders-db-data:
