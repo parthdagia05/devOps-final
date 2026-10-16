@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars and adjust. Pass the DB password through the environment instead:
+#   export TF_VAR_db_password='choose-a-strong-password'
+aws_region         = "ap-south-1"
+availability_zones = ["ap-south-1a", "ap-south-1b"]
+environment        = "production"
+cluster_version    = "1.35"

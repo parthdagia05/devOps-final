@@ -17,3 +17,8 @@ output "rds_endpoint" {
   description = "The connection endpoint for RDS PostgreSQL"
   value       = aws_db_instance.postgres.endpoint
 }
+
+output "configure_kubectl" {
+  description = "Command to point kubectl at the new cluster"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${aws_eks_cluster.main.name}"
+}

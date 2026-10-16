@@ -34,6 +34,12 @@ variable "availability_zones" {
   default     = ["ap-south-1a", "ap-south-1b"]
 }
 
+variable "cluster_version" {
+  description = "Kubernetes version for the EKS control plane"
+  type        = string
+  default     = "1.35"
+}
+
 variable "db_name" {
   description = "PostgreSQL Database Name"
   type        = string
@@ -47,7 +53,7 @@ variable "db_username" {
 }
 
 variable "db_password" {
-  description = "PostgreSQL master password"
+  description = "PostgreSQL master password (set via TF_VAR_db_password, never commit it)"
   type        = string
   sensitive   = true
 }
