@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: order-service:1.1
-          imagePullPolicy: IfNotPresent   # use the image loaded into kind; don't pull from Docker Hub
+          image: ghcr.io/parthdagia05/order-service:latest
+          imagePullPolicy: IfNotPresent   # tags are immutable commit SHAs, set by CI
           ports:
             - containerPort: 8080
           envFrom:

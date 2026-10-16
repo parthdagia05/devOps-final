@@ -10,6 +10,9 @@ on:
 permissions:
   contents: read
 
+env:
+  REGISTRY: ghcr.io/parthdagia05
+
 jobs:
   # 1. Build and Test Applications
   build-and-test:
@@ -93,6 +96,9 @@ jobs:
     name: Docker Build & Trivy Image Scan (${{ matrix.service }})
     runs-on: ubuntu-latest
     needs: [build-and-test]
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         service: [order-service, inventory-service]
@@ -104,7 +110,11 @@ jobs:
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Build Docker Image
-        run: docker build -t ${{ matrix.service }}:ci application/${{ matrix.service }}
+        run: |
+          docker build \
+            -t ${{ matrix.service }}:ci \
+            -t ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }} \
+            application/${{ matrix.service }}
 
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -114,6 +124,18 @@ jobs:
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           exit-code: '0'
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker push ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
 
   # 5. Helm Chart Linting
   helm-lint:
@@ -132,3 +154,36 @@ jobs:
         run: |
           helm lint helm/order-service
           helm template order-release helm/order-service > /dev/null
+
+  # 6. GitOps: write the new image tags back to Git so Argo CD deploys them
+  update-manifests:
+    name: Update Image Tags (GitOps)
+    runs-on: ubuntu-latest
+    needs: [container-security, gitleaks, dependency-scan, helm-lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Bump Image Tags
+        run: |
+          for svc in order-service inventory-service; do
+            sed -i -E "s#image: .*/?${svc}:.*#image: ${REGISTRY}/${svc}:${GITHUB_SHA}#" kubernetes/*-${svc}.yaml
+          done
+          sed -i -E "s#^  tag: .*#  tag: \"${GITHUB_SHA}\"#" helm/order-service/values.yaml
+          git diff --stat
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kubernetes helm/order-service/values.yaml
+          if git diff --cached --quiet; then
+            echo "Image tags already up to date"
+            exit 0
+          fi
+          git commit -m "deploy: update image tags to ${GITHUB_SHA::7}"
+          git pull --rebase origin main
+          git push origin HEAD:main
