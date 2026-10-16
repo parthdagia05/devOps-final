@@ -14,6 +14,12 @@ if ! kind get clusters | grep -qx orders; then
 fi
 kubectl config use-context kind-orders
 
+if ! kubectl get nodes -l ingress-ready=true --no-headers | grep -q .; then
+  echo "The existing 'orders' cluster was created without cluster/kind-config.yaml (no ingress-ready node)."
+  echo "Recreate it with: kind delete cluster --name orders && $0"
+  exit 1
+fi
+
 echo "==> ingress-nginx"
 kubectl apply -f "https://raw.githubusercontent.com/kubernetes/ingress-nginx/${INGRESS_NGINX_VERSION}/deploy/static/provider/kind/deploy.yaml"
 
