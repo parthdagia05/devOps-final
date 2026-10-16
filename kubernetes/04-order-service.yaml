@@ -36,19 +36,19 @@ spec:
                   key: password
           resources:
             requests:                    # what the scheduler reserves on a node
-              cpu: 250m
+              cpu: 500m                  # JVM warmup alone uses ~200m; a lower request makes the HPA scale on startup
               memory: 256Mi
             limits:                      # hard ceiling; over memory limit = OOMKilled (exit 137)
-              cpu: "1"
+              cpu: "2"
               memory: 512Mi
-          # Startup: gives the JVM up to 3 minutes to boot. Liveness and readiness only start after it passes,
+          # Startup: gives the JVM up to 5 minutes to boot. Liveness and readiness only start after it passes,
           # so a slow start under CPU pressure is not mistaken for a hung container.
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
             periodSeconds: 5
-            failureThreshold: 36
+            failureThreshold: 60
           # Readiness: "send me traffic?"  Fails -> removed from Service, NOT restarted.
           readinessProbe:
             httpGet:
