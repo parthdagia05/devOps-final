@@ -26,6 +26,14 @@ spec:
             limits:
               cpu: 500m
               memory: 384Mi
+          # Startup: gives the JVM up to 3 minutes to boot. Liveness and readiness only start after it passes,
+          # so a slow start under CPU pressure is not mistaken for a hung container.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 5
+            failureThreshold: 36
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness

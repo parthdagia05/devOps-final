@@ -12,6 +12,9 @@ spec:
     name: {{ include "order-service.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 120   # ignore the CPU spike of JVM startup
   metrics:
     - type: Resource
       resource:

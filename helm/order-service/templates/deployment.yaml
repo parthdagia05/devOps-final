@@ -40,6 +40,12 @@ spec:
                   key: password
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: {{ .Values.service.targetPort }}
+            periodSeconds: 5
+            failureThreshold: 36
           readinessProbe:
             httpGet:
               path: {{ .Values.probes.readiness.path }}

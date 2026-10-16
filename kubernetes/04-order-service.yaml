@@ -41,6 +41,14 @@ spec:
             limits:                      # hard ceiling; over memory limit = OOMKilled (exit 137)
               cpu: "1"
               memory: 512Mi
+          # Startup: gives the JVM up to 3 minutes to boot. Liveness and readiness only start after it passes,
+          # so a slow start under CPU pressure is not mistaken for a hung container.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 36
           # Readiness: "send me traffic?"  Fails -> removed from Service, NOT restarted.
           readinessProbe:
             httpGet:
