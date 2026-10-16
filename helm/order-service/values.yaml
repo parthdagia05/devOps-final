@@ -5,7 +5,7 @@ replicaCount: 2
 image:
   repository: ghcr.io/parthdagia05/order-service
   pullPolicy: IfNotPresent
-  tag: "5d3ad6857523c1fc24dd514c9dcf1791111f752c"
+  tag: "730c1d0bc184cb1d7e33327632d0fb0e3673497d"
 
 service:
   type: ClusterIP
