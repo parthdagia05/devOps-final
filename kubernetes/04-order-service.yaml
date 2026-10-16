@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: ghcr.io/parthdagia05/order-service:3589b6dcd542291305e0fa0ed750204c3050b8e9
+          image: ghcr.io/parthdagia05/order-service:69fee11dbee0ef20e0b4c2b5603c945b4afa52f6
           imagePullPolicy: IfNotPresent   # tags are immutable commit SHAs, set by CI
           ports:
             - containerPort: 8080
