@@ -1,0 +1,9 @@
+# ConfigMap = non-sensitive config. Each key becomes an env var in the app (via envFrom).
+# "postgres" in the URL is the Service name -> cluster DNS resolves it (like Compose service names).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+  namespace: orders
+data:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderdb
