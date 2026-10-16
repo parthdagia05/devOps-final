@@ -10,9 +10,7 @@ spec:
   source:
     repoURL: https://github.com/parthdagia05/devOps-final.git
     targetRevision: HEAD
-    path: kubernetes
-    directory:
-      recurse: false   # skip kubernetes/debug-drills/, those are intentionally broken
+    path: kubernetes   # not recursive, so the intentionally broken debug-drills/ are skipped
   destination:
     server: https://kubernetes.default.svc
     namespace: orders
