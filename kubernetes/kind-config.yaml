@@ -1,7 +1,0 @@
-# kind cluster: 1 control-plane (the "brain") + 1 worker (runs our pods)
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-name: orders
-nodes:
-  - role: control-plane
-  - role: worker

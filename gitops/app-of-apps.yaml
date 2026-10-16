@@ -1,3 +1,4 @@
+# Root application: Argo CD watches gitops/apps/ and creates every Application found there
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

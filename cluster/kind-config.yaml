@@ -1,0 +1,22 @@
+# kind cluster: 1 control-plane (the "brain") + 1 worker (runs our pods)
+# Kept outside kubernetes/ so Argo CD does not try to apply it as a cluster resource.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: orders
+nodes:
+  - role: control-plane
+    # ingress-nginx (kind provider) schedules onto the node with this label
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+  - role: worker
