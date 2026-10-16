@@ -1,0 +1,16 @@
+title = "OrderSystem Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow test mock credentials in test files and documentation"
+paths = [
+  '''kubernetes/debug-drills/''',
+  '''helm/order-service/values.yaml''',
+  '''docker/docker-compose.yml'''
+]
+regexes = [
+  '''orderpass''',
+  '''orderuser'''
+]

@@ -1,0 +1,15 @@
+# Trivy Configuration for OrderSystem
+exit-code: 0
+severity:
+  - HIGH
+  - CRITICAL
+ignore-unfixed: true
+format: table
+timeout: 10m
+vuln-type:
+  - os
+  - library
+scanners:
+  - vuln
+  - secret
+  - misconfig
