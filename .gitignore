@@ -1,0 +1,23 @@
+# Compiled class files & build directories
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+*.class
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
