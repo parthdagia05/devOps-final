@@ -31,8 +31,8 @@ data:
           "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
           "targets": [
             {
-              "expr": "up{job=\"order-service\"}",
-              "legendFormat": "{{instance}}"
+              "expr": "up{job=~\"order-service|inventory-service\"}",
+              "legendFormat": "{{job}}"
             }
           ]
         },

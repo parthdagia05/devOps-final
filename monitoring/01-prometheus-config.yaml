@@ -23,6 +23,12 @@ data:
         static_configs:
           - targets: ['order-service.orders.svc.cluster.local:80']
 
+      - job_name: 'inventory-service'
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['inventory-service.orders.svc.cluster.local:8081']
+
   alert.rules.yml: |
     groups:
       - name: order_service_alerts
@@ -35,6 +41,15 @@ data:
             annotations:
               summary: "Order Service instance is DOWN"
               description: "Order Service in orders namespace has stopped responding for > 30 seconds."
+
+          - alert: InventoryServiceDown
+            expr: up{job="inventory-service"} == 0
+            for: 30s
+            labels:
+              severity: critical
+            annotations:
+              summary: "Inventory Service instance is DOWN"
+              description: "Inventory Service in orders namespace has stopped responding for > 30 seconds."
 
           - alert: HighOrderErrorRate
             expr: rate(http_server_requests_seconds_count{status=~"5.."}[1m]) > 0.05
