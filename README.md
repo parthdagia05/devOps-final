@@ -2,7 +2,7 @@
 
 An order processing platform built from two Spring Boot microservices and shipped through a full DevSecOps pipeline: GitHub Actions CI with security gates, container images on GHCR, GitOps delivery with Argo CD, Kubernetes (kind locally, EKS on AWS), infrastructure as code with Terraform, and observability with Prometheus and Grafana.
 
-📁 **Demo material**: [`demo/`](demo/) contains the slide deck and the presentation video.
+📁 **Demo material**: [`demo/`](demo/) contains the [slide deck](demo/OrderSystem-DevSecOps.pdf) and the [presentation video](demo/presentation.mp4).
 
 ---
 
